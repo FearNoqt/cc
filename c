@@ -1,9 +1,4 @@
-if game.PlaceId ~= 123456789 then
-    game.Players.PlayerAdded:Connect(function(player)
-        player:Kick("NOT GAME")
-    end)
-    return
-end
+
 
 
 local plrs = game:GetService("Players")
@@ -1225,20 +1220,20 @@ settextbox(loopflingv2)(function()
     table.insert(flingV2LoopConnections, conn)
 end)
 
-settextbox(anvilkill)(function(text)
-    print("anvilkill textbox changed:", text)
+settextbox(anvilkill)(function()
+     print("hi)
 end)
 
-settextbox(orbitheight)(function(text)
-    print("orbitheight changed:", text)
+settextbox(orbitheight)(function()
+    print("hi)
 end)
 
-settextbox(orbitradius)(function(text)
-    print("orbitradius changed:", text)
+settextbox(orbitradius)(function()
+     print("hi)
 end)
 
-settextbox(orbitspeed)(function(text)
-    print("orbitspeed changed:", text)
+settextbox(orbitspeed)(function()
+    print("hi)
 end)
 
 
