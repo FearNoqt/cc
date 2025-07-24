@@ -1,3 +1,30 @@
+if game.PlaceId ~= 123456789 then
+    game.Players.PlayerAdded:Connect(function(player)
+        player:Kick("NOT GAME")
+    end)
+    return
+end
+
+
+local plrs = game:GetService("Players")
+local plr = plrs.LocalPlayer
+local mouse = plr:GetMouse()
+local RunService = game:GetService("RunService")
+local propy = PhysicalProperties.new(1000, 1000, 0, 1000, 0)
+
+local function findplr(text)
+    text = text:lower()
+    for _, v in pairs(plrs:GetPlayers()) do
+        if v ~= plr and (v.Name:lower():find(text) or v.DisplayName:lower():find(text)) then
+            return v
+        end
+    end
+end
+
+
+
+
+
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
 local Line = Instance.new("Frame")
@@ -56,21 +83,18 @@ local KeybindsB = Instance.new("TextButton")
 local MainB = Instance.new("TextButton")
 local MiscB = Instance.new("TextButton")
 local ToolsB = Instance.new("TextButton")
-local Profile = Instance.new("Frame")
-local ProfileImage = Instance.new("ImageLabel")
-local Playername = Instance.new("TextLabel")
-local Displayname = Instance.new("TextLabel")
-local AnvilKill = Instance.new("TextButton")
-local flingprofile = Instance.new("TextButton")
-local flingv2profile = Instance.new("TextButton")
+
+--Properties:
 
 GUI.Name = "GUI"
 GUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 GUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+GUI.ResetOnSpawn = false
 
 Container.Name = "Container"
 Container.Parent = GUI
 Container.Active = true
+Container.Draggable = true
 Container.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
 Container.BackgroundTransparency = 0.200
 Container.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -117,6 +141,7 @@ Main.BackgroundTransparency = 0.200
 Main.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Main.BorderSizePixel = 0
 Main.Size = UDim2.new(0, 380, 0, 240)
+Main.Visible = false
 
 Antifling.Name = "Antifling"
 Antifling.Parent = Main
@@ -636,7 +661,6 @@ Global.BackgroundTransparency = 0.200
 Global.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Global.BorderSizePixel = 0
 Global.Size = UDim2.new(0, 380, 0, 240)
-Global.Visible = false
 
 LagServer.Name = "LagServer"
 LagServer.Parent = Global
@@ -748,120 +772,503 @@ ToolsB.TextScaled = true
 ToolsB.TextSize = 14.000
 ToolsB.TextWrapped = true
 
-Profile.Name = "Profile"
-Profile.Parent = GUI
-Profile.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Profile.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Profile.BorderSizePixel = 0
-Profile.Position = UDim2.new(0.403158754, 0, 0.366828918, 0)
-Profile.Size = UDim2.new(0, 186, 0, 203)
-Profile.Visible = false
+--[[
+scripts]]
+-- antifling
 
-ProfileImage.Name = "ProfileImage"
-ProfileImage.Parent = Profile
-ProfileImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ProfileImage.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ProfileImage.BorderSizePixel = 0
-ProfileImage.Position = UDim2.new(0.0483870953, 0, 0.0295566507, 0)
-ProfileImage.Size = UDim2.new(0, 58, 0, 54)
-ProfileImage.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+local antifling = false
 
-Playername.Name = "Playername"
-Playername.Parent = ProfileImage
-Playername.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Playername.BackgroundTransparency = 1.000
-Playername.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Playername.BorderSizePixel = 0
-Playername.Position = UDim2.new(1.2241379, 0, 0, 0)
-Playername.Size = UDim2.new(0, 99, 0, 18)
-Playername.Font = Enum.Font.SourceSans
-Playername.Text = "playername"
-Playername.TextColor3 = Color3.fromRGB(255, 255, 255)
-Playername.TextSize = 14.000
-Playername.TextXAlignment = Enum.TextXAlignment.Left
+local p = game:GetService("Players").LocalPlayer
+local c = p.Character or p.CharacterAdded:Wait()
 
-Displayname.Name = "Displayname"
-Displayname.Parent = ProfileImage
-Displayname.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Displayname.BackgroundTransparency = 1.000
-Displayname.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Displayname.BorderSizePixel = 0
-Displayname.Position = UDim2.new(1.2241379, 0, 0.333333343, 0)
-Displayname.Size = UDim2.new(0, 99, 0, 18)
-Displayname.Font = Enum.Font.SourceSans
-Displayname.Text = "displayname"
-Displayname.TextColor3 = Color3.fromRGB(255, 255, 255)
-Displayname.TextSize = 14.000
-Displayname.TextXAlignment = Enum.TextXAlignment.Left
+local function gw(o) return o:FindFirstChild("ConnectedWeld") end
+local function ic(w) return w and w.Part1 and w.Part1:IsDescendantOf(p.Character) end
+local function d(o) 
+    local w = gw(o) 
+    if ic(w) then 
+        o:Destroy() 
+    end 
+end
 
-AnvilKill.Name = "AnvilKill"
-AnvilKill.Parent = Profile
-AnvilKill.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-AnvilKill.BorderColor3 = Color3.fromRGB(0, 0, 0)
-AnvilKill.BorderSizePixel = 0
-AnvilKill.Position = UDim2.new(0, 0, 0.325123161, 0)
-AnvilKill.Size = UDim2.new(0, 186, 0, 20)
-AnvilKill.Font = Enum.Font.SourceSans
-AnvilKill.Text = "AnvilKill"
-AnvilKill.TextColor3 = Color3.fromRGB(255, 255, 255)
-AnvilKill.TextSize = 17.000
+workspace.DescendantAdded:Connect(function(o)
+    if not antifling then return end
+    if o.Name == "Stabler" then
+        task.spawn(function()
+            if gw(o) or o:WaitForChild("ConnectedWeld", 10) then 
+                d(o) 
+            end
+        end)
+    end
+end)
 
-flingprofile.Name = "flingprofile"
-flingprofile.Parent = Profile
-flingprofile.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-flingprofile.BorderColor3 = Color3.fromRGB(0, 0, 0)
-flingprofile.BorderSizePixel = 0
-flingprofile.Position = UDim2.new(0, 0, 0.423645318, 0)
-flingprofile.Size = UDim2.new(0, 186, 0, 20)
-flingprofile.Font = Enum.Font.SourceSans
-flingprofile.Text = "FIing"
-flingprofile.TextColor3 = Color3.fromRGB(255, 255, 255)
-flingprofile.TextSize = 17.000
+local function mp(p) return p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" end
+local function mm(p) p.Massless = true end
+local function ma(c) 
+    for _, v in ipairs(c:GetDescendants()) do 
+        if mp(v) then 
+            mm(v) 
+        end 
+    end 
+end
 
-flingv2profile.Name = "flingv2profile"
-flingv2profile.Parent = Profile
-flingv2profile.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-flingv2profile.BorderColor3 = Color3.fromRGB(0, 0, 0)
-flingv2profile.BorderSizePixel = 0
-flingv2profile.Position = UDim2.new(0, 0, 0.522167504, 0)
-flingv2profile.Size = UDim2.new(0, 186, 0, 20)
-flingv2profile.Font = Enum.Font.SourceSans
-flingv2profile.Text = "FIing v2"
-flingv2profile.TextColor3 = Color3.fromRGB(255, 255, 255)
-flingv2profile.TextSize = 17.000
+local function ga(c) return c:FindFirstChild("ArmAngleChange") end
+local function cf()
+    return CFrame.new(0.999999583, 0.650959253, 0.0507530943,
+        0.994099438, 0.0974220186, 0.0476996154,
+        -0.0791255683, 0.952069402, -0.295470744,
+        -0.074198693, 0.289953023, 0.954160273)
+end
+local function sa(c) 
+    local e = ga(c) 
+    if e then 
+        e:FireServer(cf()) 
+    end 
+end
 
---[[toggles , buttons , textboxs]]
+local loopActive = false
+
+local function loop()
+    if loopActive then return end
+    loopActive = true
+    while antifling and c and p.Character == c do
+        ma(c)
+        sa(c)
+        task.wait(0.2)
+    end
+    loopActive = false
+end
+
+p.CharacterAdded:Connect(function(nc)
+    c = nc
+    if antifling then
+        task.spawn(loop)
+    end
+end)
+
+
+-- antianvil
+local antianvil = false
+
+RunService.Heartbeat:Connect(function()
+    if not antianvil then return end
+    if plr.Parent == nil then return end
+    for _, v in pairs(workspace:GetChildren()) do
+        if v:IsA("BasePart") and v.Name == "Anvil" and v:FindFirstChild("Script") then
+            local scriptValue = v.Script:FindFirstChild("Value")
+            if scriptValue and scriptValue.Value ~= plr then
+                plr.Character.Picking:FireServer(v, Vector3.new(math.huge, -math.huge, math.huge))
+                task.wait(0.1)
+                plr.Character.PuttingDown:FireServer()
+            end
+        end
+    end
+end)
+
+-- antispinner
+plr.CharacterAdded:Connect(function(char)
+    task.wait(1)
+    if toggleStates[AntiSpinner] then
+        for _, v in next, char:GetChildren() do
+            if v:IsA("BasePart") then
+                v.CustomPhysicalProperties = propy
+            end
+        end
+    end
+end)
+
+
+-- fake accs
+local fakeaccs = false
+
+local function applyFakeAccs()
+    while fakeaccs do
+        for _, v in next, plr.Character:GetChildren() do
+            if v:IsA("Accessory") and v:FindFirstChild("Handle") and v.Name ~= "FakeAcc" then
+                local clone = v:Clone()
+                v:Destroy()
+                clone.Name = "FakeAcc"
+                clone.Parent = plr.Character
+            end
+        end
+
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Head") then
+            for _, v in next, plr.Character:GetChildren() do
+                if v:IsA("BasePart") then
+                    v.CustomPhysicalProperties = propy
+                end
+            end
+        end
+
+        task.wait(0.5)
+    end
+end
+
+-- fling aura
+
+local flingAura = false
+
+RunService.Heartbeat:Connect(function()
+    if not flingAura or not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then return end
+
+    local hrp = plr.Character.HumanoidRootPart
+
+    for _, v in ipairs(game.Players:GetPlayers()) do
+        if v ~= plr and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+            local otherHRP = v.Character.HumanoidRootPart
+            if (hrp.Position - otherHRP.Position).Magnitude < 10 then
+                pcall(function()
+                    plr.Character.Picking:FireServer(otherHRP, Vector3.new(math.huge, -math.huge, math.huge))
+                    task.wait(0.1)
+                    plr.Character.PuttingDown:FireServer()
+                end)
+            end
+        end
+    end
+end)
+
+
+-- antiragdoll
+local antiragdoll = false
+
+RunService.Heartbeat:Connect(function()
+    if not antiragdoll or not plr.Character then return end
+    local char = plr.Character
+
+    pcall (function()
+        if char:FindFirstChild("Ragdoll") and char.Ragdoll.Value then
+            char.GetUpEvent:FireServer()
+        end
+    end)
+
+    for _, v in next, char:GetChildren() do
+        if v.Name == "Stabler" or v.Name == "VelocityDamage" or v.Name == "GetPicked"
+        or v.Name == "ArmAngleUpdate" or v.Name == "ArmAngle" then
+            v:Destroy()
+        end
+    end
+end)
+
+-- antivoid
+local antivoid = false
+
+plr.CharacterAdded:Connect(function()
+    task.wait(0.5)
+    if antivoid then
+        workspace.FallenDestroyHeight = 0/0
+    end
+end)
+
+
+-- lfp
+local flingTextBox = fling
+local loopflingTextBox = loopfling
+local isLoopFlingActive = false
+local loopConnections = {}   
+-- lfp v2
+local isFlingV2Looping = false
+local flingV2LoopConnections = {}  
+local isHiddenV2Active = false
+
+--[[
+Toggle , Button , Textbox]]
+
+
+
 local toggleStates = {}
 
 function settoggle(button, colorFrame)
-	return function(callback)
-		toggleStates[button] = false
-		button.MouseButton1Click:Connect(function()
-			toggleStates[button] = not toggleStates[button]
-			if toggleStates[button] then
-				colorFrame.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-			else
-				colorFrame.BackgroundColor3 = Color3.fromRGB(153, 0, 0)
-			end
-			if callback then callback(toggleStates[button]) end
-		end)
-	end
+    return function(callback)
+        toggleStates[button] = false
+        button.MouseButton1Click:Connect(function()
+            toggleStates[button] = not toggleStates[button]
+            if toggleStates[button] then
+                colorFrame.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+            else
+                colorFrame.BackgroundColor3 = Color3.fromRGB(153, 0, 0)
+            end
+            if callback then callback(toggleStates[button]) end
+        end)
+    end
 end
 
 function setbutton(button)
-	return function(callback)
-		button.MouseButton1Click:Connect(function()
-			if callback then callback() end
-		end)
-	end
+    return function(callback)
+        button.MouseButton1Click:Connect(function()
+            if callback then callback() end
+        end)
+    end
 end
 
 function settextbox(textbox)
-	return function(callback)
-		textbox.FocusLost:Connect(function(enterPressed)
-			if enterPressed and callback then
-				callback()
-			end
-		end)
-	end
+    return function(callback)
+        textbox.FocusLost:Connect(function(enterPressed)
+            if enterPressed and callback then
+                callback()
+            end
+        end)
+    end
 end
+
+settoggle(Antifling, fccolor)(function(state)
+    antifling = state
+    if antifling then
+        task.spawn(loop)
+    end
+end)
+
+
+settoggle(AntiAnvil, fccolor2)(function(state)
+    antianvil = state
+end)
+
+settoggle(FakeAccs, fccolor3)(function(state)
+    fakeaccs = state
+    if fakeaccs then
+        task.spawn(applyFakeAccs)
+    end
+end)
+
+settoggle(AntiSpinner, fccolor4)(function(state)
+    if state then
+        for _, v in next, plr.Character:GetChildren() do
+            if v:IsA("BasePart") then
+                v.CustomPhysicalProperties = propy
+            end
+        end
+    else
+        for _, v in next, plr.Character:GetDescendants() do
+            pcall(function()
+                if v:IsA("BasePart") then
+                    v.CustomPhysicalProperties = PhysicalProperties.new(0.3, 0.2, 0, 0.2, 0.2)
+                end
+            end)
+        end
+    end
+end)
+
+settoggle(AntiRagdoll, fccolor5)(function(state)
+    antiragdoll = state
+end)
+
+setbutton(HackMovement)(function()
+    print("HackMovement clicked")
+end)
+
+setbutton(ClearLoop)(function()
+    for _, conn in ipairs(loopConnections) do
+        if conn then conn:Disconnect() end
+    end
+    loopConnections = {}
+
+    for _, conn in ipairs(flingV2LoopConnections) do
+        if conn then conn:Disconnect() end
+    end
+    flingV2LoopConnections = {}
+
+    plr.Character.PuttingDown:FireServer()
+end)
+
+settoggle(AntiVoid, fccolor7)(function(state)
+    antivoid = state
+    workspace.FallenDestroyHeight = antivoid and 0/0 or -500
+end)
+
+settoggle(FlingAura, fccolor8)(function(state)
+    flingAura = state
+    if not state and plr.Character and plr.Character:FindFirstChild("Picked") and plr.Character.Picked.Value then
+        plr.Character.PuttingDown:FireServer()
+    end
+end))
+
+settoggle(AutoRespawn, fccolor9)(function(state)
+    print("AutoRespawn toggled:", state)
+end)
+
+settoggle(Hiddenv2, fccolor10)(function(state)
+    isHiddenV2Active = state
+end)
+
+settoggle(AntiVelocity, fccolor1)(function(state)
+    print("AntiVelocity toggled:", state)
+end)
+
+settoggle(AnvilOrbit, fccolor11)(function(state)
+    print("AnvilOrbit toggled:", state)
+end)
+
+settoggle(AntiAnvilBreak, fccolor12)(function(state)
+    print("AntiAnvilBreak toggled:", state)
+end)
+
+settoggle(AutoThrow, fccolor14)(function(state)
+    print("AutoThrow toggled:", state)
+end)
+
+settoggle(LowPP, fccolor15)(function(state)
+    print("LowPP toggled:", state)
+end)
+
+settoggle(AnvilDrone, fccolor13)(function(state)
+    print("AnvilDrone toggled:", state)
+end)
+
+settoggle(LagServer, fccolor16)(function(state)
+    print("LagServer toggled:", state)
+end)
+
+settextbox(loopflingTextBox)(function()
+    local input = loopflingTextBox.Text
+    loopflingTextBox.Text = ""
+
+    local targetPlayer = findplr(input)
+    if not targetPlayer or not targetPlayer.Character then return end
+
+    local conn = RunService.Heartbeat:Connect(function()
+        local hrp = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            for i = 1, 4 do
+                plr.Character.Picking:FireServer(hrp, Vector3.new(math.huge, math.huge, math.huge))
+            end
+            plr.Character.PuttingDown:FireServer()
+        end
+    end)
+
+    table.insert(loopConnections, conn)
+end)
+
+settextbox(loopflingTextBox)(function()
+    local input = loopflingTextBox.Text
+    loopflingTextBox.Text = ""
+
+    local targetPlayer = findplr(input)
+    if not targetPlayer then return end
+
+    if loopConnection then
+        loopConnection:Disconnect()
+        loopConnection = nil
+    end
+
+    isLoopFlingActive = true
+    loopConnection = RunService.Heartbeat:Connect(function()
+        if not isLoopFlingActive then return end
+
+        local targetPart = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if targetPart then
+            plr.Character.Picking:FireServer(targetPart, Vector3.new(math.huge, -math.huge, math.huge))
+            task.wait(0.1)
+            plr.Character.PuttingDown:FireServer()
+        end
+    end)
+end)
+
+settextbox(flingv2)(function()
+    local input = flingv2.Text
+    flingv2.Text = ""
+
+    local targetPlayer = findplr(input)
+    if not targetPlayer or not targetPlayer.Character then return end
+
+    local model = targetPlayer.Character
+    local armch = model:FindFirstChild("ArmAngleChange")
+    if armch then
+        if isHiddenV2Active then
+            armch:FireServer(CFrame.new(
+                math.random(-999, 99999),
+                math.random(-999, 99999),
+                math.random(-900, 99999),
+                math.random(), math.random(), math.random(),
+                math.random(), math.random(), math.random(),
+                math.random(), math.random(), math.random()
+            ))
+        else
+            armch:FireServer(CFrame.new(
+                -math.huge, math.huge, -3,
+                0, 0.01, 0.1,
+                0, 0, 0,
+                0, 0, 1
+            ))
+        end
+    end
+end)
+
+settextbox(loopflingv2)(function()
+    local input = loopflingv2.Text
+    loopflingv2.Text = ""
+
+    local targetPlayer = findplr(input)
+    if not targetPlayer or not targetPlayer.Character then return end
+
+    local conn = RunService.Heartbeat:Connect(function()
+        local model = targetPlayer.Character
+        local armch = model:FindFirstChild("ArmAngleChange")
+        if armch then
+            if isHiddenV2Active then
+                armch:FireServer(CFrame.new(
+                    math.random(-999, 99999),
+                    math.random(-999, 99999),
+                    math.random(-999, 99999),
+                    math.random(), math.random(), math.random(),
+                    math.random(), math.random(), math.random(),
+                    math.random(), math.random(), math.random()
+                ))
+            else
+                armch:FireServer(CFrame.new(
+                    -math.huge, math.huge, -3,
+                    0, 0.01, 0.1,
+                    0, 0, 0,
+                    0, 0, 1
+                ))
+            end
+        end
+    end)
+
+    table.insert(flingV2LoopConnections, conn)
+end)
+
+settextbox(anvilkill)(function(text)
+    print("anvilkill textbox changed:", text)
+end)
+
+settextbox(orbitheight)(function(text)
+    print("orbitheight changed:", text)
+end)
+
+settextbox(orbitradius)(function(text)
+    print("orbitradius changed:", text)
+end)
+
+settextbox(orbitspeed)(function(text)
+    print("orbitspeed changed:", text)
+end)
+
+
+
+
+local allTabs = {Main, Tools, Global, Misc, Keybinds}
+
+local function openTab(tab)
+    for _, t in pairs(allTabs) do
+        t.Visible = false
+    end
+    tab.Visible = true
+end
+
+setbutton(MainB)(function()
+    openTab(Main)
+end)
+
+setbutton(ToolsB)(function()
+    openTab(Tools)
+end)
+
+setbutton(GlobalB)(function()
+    openTab(Global)
+end)
+
+setbutton(MiscB)(function()
+    openTab(Misc)
+end)
+
+setbutton(KeybindsB)(function()
+    openTab(Keybinds)
+end)
