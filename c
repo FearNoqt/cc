@@ -1416,19 +1416,19 @@ settextbox(loopflingv2)(function()
 end)
 
 settextbox(anvilkill)(function()
-    print("anvilkill textbox changed:", anvilkill.Text)
+    print("anvilkill textbox changed:")
 end)
 
 settextbox(orbitheight)(function()
-    print("orbitheight changed:", orbitheight.Text)
+    print("orbitheight changed:")
 end)
 
 settextbox(orbitradius)(function()
-    print("orbitradius changed:", orbitradius.Text)
+    print("orbitradius changed:")
 end)
 
 settextbox(orbitspeed)(function()
-    print("orbitspeed changed:", orbitspeed.Text)
+    print("orbitspeed changed:")
 end)
 
 
