@@ -1,3 +1,4 @@
+
 local plrs = game:GetService("Players")
 local plr = plrs.LocalPlayer
 local mouse = plr:GetMouse()
@@ -1323,7 +1324,23 @@ settoggle(LagServer, fccolor16)(function(state)
 end)
 
 settextbox(flingTextBox)(function()
-print("TEST")
+    local input = flingTextBox.Text
+    flingTextBox.Text = ""
+
+    local targetPlayer = findplr(input)
+    if not targetPlayer or not targetPlayer.Character then return end
+
+    local conn = RunService.Heartbeat:Connect(function()
+        local hrp = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            for i = 1, 4 do
+                plr.Character.Picking:FireServer(hrp, Vector3.new(math.huge, math.huge, math.huge))
+            end
+            plr.Character.PuttingDown:FireServer()
+        end
+    end)
+
+    table.insert(loopConnections, conn)
 end)
 
 settextbox(loopflingTextBox)(function()
@@ -1415,8 +1432,8 @@ settextbox(loopflingv2)(function()
     table.insert(flingV2LoopConnections, conn)
 end)
 
-
-
+settextbox(anvilkill)(function()
+end)
 
 
 local allTabs = {Main, Tools, Global, Misc, Keybinds}
